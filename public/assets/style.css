@@ -1,0 +1,432 @@
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background-color: #f5f6f8;
+  color: #222;
+}
+
+/* TOPBAR */
+.sn-topbar {
+  background: #111;
+  color: #fff;
+  padding: 8px 0;
+}
+
+.sn-logo a {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.sn-search input {
+  max-width: 260px;
+  font-size: 0.9rem;
+}
+
+/* MAIN NAV */
+.sn-mainnav {
+  background: #f52952;
+}
+
+.sn-nav-list .nav-link {
+  color: #ffe9ef;
+  font-weight: 500;
+  padding: 10px 16px;
+}
+
+.sn-nav-list .nav-link:hover,
+.sn-nav-list .nav-link:focus {
+  color: #fff;
+  background: #ff3260;
+}
+
+/* MAIN WRAP */
+.sn-main {
+  padding: 24px 0 40px;
+}
+
+/* BLOCK TITLE */
+.sn-block-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+  border-bottom: 2px solid #e0e0e0;
+  padding-bottom: 8px;
+}
+
+/* ARTICLE CARD */
+.sn-article-card {
+  display: flex;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.sn-article-card:last-child {
+  border-bottom: none;
+}
+
+.sn-article-thumb {
+  flex: 0 0 120px;
+  display: block;
+  background: #f0f0f0;
+}
+
+.sn-article-thumb img {
+  width: 120px;
+  height: 80px;
+  object-fit: cover;
+  display: block;
+}
+
+.sn-thumb-placeholder {
+  width: 120px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  color: #aaa;
+}
+
+.sn-article-body {
+  flex: 1;
+}
+
+.sn-article-title {
+  font-size: 1rem;
+  margin: 0 0 4px;
+}
+
+.sn-article-title a {
+  color: #111;
+  text-decoration: none;
+}
+
+.sn-article-title a:hover {
+  color: #d0173a;
+}
+
+.sn-article-meta {
+  font-size: 0.8rem;
+  color: #888;
+  margin-bottom: 6px;
+}
+
+.sn-article-excerpt {
+  font-size: 0.9rem;
+  color: #444;
+  margin: 0;
+}
+
+/* SIDEBAR WIDGET */
+.sn-widget {
+  background: #fff;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(15, 24, 44, 0.08);
+  margin-bottom: 16px;
+}
+
+.sn-widget-header {
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.sn-widget-header--blue {
+  background: #0074e4;
+}
+
+.sn-widget-header--green {
+  background: #008a3a;
+}
+
+.sn-widget-header--orange {
+  background: #f79b1b;
+}
+
+.sn-widget-body {
+  padding: 10px 12px;
+  font-size: 0.9rem;
+}
+
+/* Match row */
+.sn-match-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 0;
+  border-bottom: 1px dashed #e2e2e2;
+  font-size: 0.85rem;
+}
+
+.sn-match-row:last-child {
+  border-bottom: none;
+}
+
+.sn-match-time {
+  color: #888;
+  width: 52px;
+}
+
+.sn-match-teams {
+  flex: 1;
+  padding: 0 6px;
+}
+
+.sn-match-score {
+  font-weight: 700;
+}
+
+/* Standings table */
+.sn-table-standings thead th {
+  background: #f8f9fa;
+  font-size: 0.8rem;
+}
+
+.sn-table-standings td,
+.sn-table-standings th {
+  padding: 4px 8px;
+  font-size: 0.8rem;
+}
+
+/* Trending list */
+.sn-list-trending {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.sn-list-trending li {
+  padding: 4px 0;
+  border-bottom: 1px dashed #e2e2e2;
+}
+
+.sn-list-trending li:last-child {
+  border-bottom: none;
+}
+
+.sn-list-trending a {
+  font-size: 0.9rem;
+  text-decoration: none;
+  color: #111;
+}
+
+.sn-list-trending a:hover {
+  color: #d0173a;
+}
+
+/* FOOTER */
+.sn-footer {
+  background: #111;
+  color: #aaa;
+  padding: 16px 0;
+  font-size: 0.8rem;
+}
+
+/* ===========================
+   HOME HERO (kiểu Thể Thao 247)
+   =========================== */
+.sn-home-hero {
+  margin-bottom: 16px;
+}
+
+.sn-hero-main {
+  position: relative;
+  overflow: hidden;
+  border-radius: 4px;
+}
+
+.sn-hero-main-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+.sn-hero-main img,
+.sn-hero-main-placeholder {
+  width: 100%;
+  height: 320px;
+  object-fit: cover;
+  background: #e0e0e0;
+}
+
+.sn-hero-main-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  color: #777;
+}
+
+.sn-hero-main-caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 10px 14px;
+  background: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.05));
+  color: #fff;
+}
+
+.sn-hero-main-category {
+  display: inline-block;
+  padding: 2px 6px;
+  margin-bottom: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  background: #ffb300; /* màu điểm nhấn khác ThểThao247 1 chút */
+  border-radius: 2px;
+}
+
+.sn-hero-main-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+/* Hero secondary */
+.sn-hero-secondary-item {
+  display: flex;
+  gap: 8px;
+}
+
+.sn-hero-secondary-thumb {
+  flex: 0 0 110px;
+  display: block;
+  background: #f0f0f0;
+}
+
+.sn-hero-secondary-thumb img {
+  width: 110px;
+  height: 75px;
+  object-fit: cover;
+}
+
+.sn-hero-secondary-body {
+  flex: 1;
+}
+
+.sn-hero-secondary-cat {
+  font-size: 0.75rem;
+  color: #888;
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+
+.sn-hero-secondary-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.3;
+  margin: 0;
+}
+
+.sn-hero-secondary-title a {
+  text-decoration: none;
+  color: #111;
+}
+
+.sn-hero-secondary-title a:hover {
+  color: #d0173a;
+}
+
+/* Số thứ tự tin trending */
+.sn-trending-index {
+  display: inline-block;
+  min-width: 20px;
+  text-align: center;
+  font-weight: 700;
+  margin-right: 4px;
+  color: #d0173a;
+}
+
+/* Responsive */
+@media (max-width: 991.98px) {
+  .sn-hero-main img,
+  .sn-hero-main-placeholder {
+    height: 240px;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .sn-hero-main img,
+  .sn-hero-main-placeholder {
+    height: 200px;
+  }
+}
+/* ======================
+   BANNER ADs
+   ====================== */
+
+.sn-banner {
+  position: relative;
+  margin: 12px 0;
+}
+
+.sn-banner-item + .sn-banner-item {
+  margin-top: 8px;
+}
+
+.sn-banner-link,
+.sn-banner img {
+  display: block;
+  width: 100%;
+}
+
+.sn-banner img {
+  border-radius: 6px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+  object-fit: cover;
+  background: #f3f3f3;
+}
+
+/* Top banner ngang */
+.sn-banner--top img {
+  max-height: 110px;
+}
+
+/* Sidebar banner bên phải */
+.sn-banner--sidebar {
+  max-width: 336px;       /* chuẩn Google 300/320/336 */
+  margin-left: auto;
+}
+
+.sn-banner--sidebar img {
+  max-height: 260px;
+}
+
+/* Nút đóng banner */
+.sn-banner-close {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.65);
+  color: #fff;
+  font-size: 14px;
+  line-height: 22px;
+  text-align: center;
+  cursor: pointer;
+  outline: none;
+  z-index: 10;
+}
+.sn-banner-close:hover {
+  background: rgba(0, 0, 0, 0.85);
+}
+
+/* Mobile: co lại một chút */
+@media (max-width: 575.98px) {
+  .sn-banner--top img {
+    max-height: 80px;
+  }
+
+  .sn-banner--sidebar {
+    max-width: 100%;
+  }
+}
