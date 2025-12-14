@@ -17,16 +17,48 @@ class Posts extends BaseController
         $this->categoryModel = new CategoryModel();
     }
 
-    public function index()
-    {
-        if ($r = require_role(['admin','editor','writer'])) return $r;
+   public function index()
+{
+    // Kiểm tra quyền truy cập
+    if ($r = require_role(['admin','editor','writer'])) return $r;
 
-        $data['title'] = 'Quản lý bài viết';
-        $data['posts'] = $this->postModel->orderBy('created_at','DESC')->paginate(20);
-        $data['pager'] = $this->postModel->pager;
+    $data['title'] = 'Quản lý bài viết';
 
-        return view('admin/posts/index', $data);
+    // Lấy các tham số từ GET request (tìm kiếm và bộ lọc)
+    $title = $this->request->getGet('title');
+    $status = $this->request->getGet('status');
+    $start_date = $this->request->getGet('start_date');
+    $end_date = $this->request->getGet('end_date');
+
+    // Xây dựng truy vấn với bộ lọc
+    $builder = $this->postModel->orderBy('created_at', 'DESC');
+
+    if ($title) {
+        $builder->like('title', $title);
     }
+    if ($status) {
+        $builder->where('status', $status);
+    }
+    if ($start_date) {
+        $builder->where('created_at >=', $start_date);
+    }
+    if ($end_date) {
+        $builder->where('created_at <=', $end_date);
+    }
+
+    // Thực hiện truy vấn và phân trang
+    $data['posts'] = $builder->paginate(20);
+    $data['pager'] = $this->postModel->pager;
+
+    // Truyền các giá trị lọc về view để giữ lại khi người dùng tìm kiếm
+    $data['title_filter'] = $title;
+    $data['status_filter'] = $status;
+    $data['start_date_filter'] = $start_date;
+    $data['end_date_filter'] = $end_date;
+
+    return view('admin/posts/index', $data);
+}
+
 
     public function new()
     {

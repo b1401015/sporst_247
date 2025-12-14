@@ -1,27 +1,344 @@
 <?= $this->extend('layouts/main') ?>
 <?= $this->section('content') ?>
 
-<h5 class="border-bottom pb-1 mb-3"><?= esc($category['name']) ?></h5>
+<?php
+// helper: lấy ảnh bài viết (tùy theo DB bạn đang đặt field gì)
+$imgOf = function(array $p): string {
+    $img = $p['image'] ?? $p['thumbnail'] ?? $p['thumb'] ?? '';
+    if ($img) return base_url($img);
+    return base_url('image/48.jpg'); // fallback (đúng theo template bạn dùng)
+};
 
-<?php if (!empty($posts)): ?>
-    <?php foreach ($posts as $post): ?>
-        <div class="d-flex mb-2 latest-item">
-            <img src="<?= esc($post['thumbnail'] ?? '/assets/placeholder_small.jpg') ?>" width="140" class="me-2 flex-shrink-0" alt="" loading="lazy">
-            <div>
-                <h6 class="mb-1">
-                    <a href="/post/<?= esc($post['slug']) ?>" class="text-dark">
-                        <?= esc($post['title']) ?>
-                    </a>
-                </h6>
-                <p class="small text-muted mb-1"><?= esc($post['summary']) ?></p>
-                <?php if (!empty($post['published_at'])): ?>
-                    <small class="text-muted"><?= date('d/m/Y H:i', strtotime($post['published_at'])) ?></small>
-                <?php endif; ?>
-            </div>
+$dateOf = function(array $p): string {
+    $raw = $p['created_at'] ?? $p['createdAt'] ?? $p['date'] ?? null;
+    if (! $raw) return '';
+    try {
+        return date('M d, Y', strtotime($raw));
+    } catch (\Throwable $e) {
+        return (string) $raw;
+    }
+};
+
+$urlOf = function(array $p): string {
+    $slug = $p['slug'] ?? $p['post_slug'] ?? '';
+    if ($slug) return site_url('post/' . $slug);
+    $id = $p['id'] ?? 0;
+    return $id ? site_url('post/' . $id) : '#';
+};
+
+$excerptOf = function(array $p): string {
+    $ex = $p['excerpt'] ?? $p['description'] ?? $p['summary'] ?? '';
+    if (! $ex) return '';
+    $ex = strip_tags($ex);
+    return mb_strimwidth($ex, 0, 140, '...');
+};
+
+$viewsOf = function(array $p): string {
+    return (string) ($p['views'] ?? 0);
+};
+
+$likesOf = function(array $p): string {
+    return (string) ($p['likes'] ?? $p['like_count'] ?? 0);
+};
+
+$commentsOf = function(array $p): string {
+    return (string) ($p['comment_count'] ?? 0);
+};
+?>
+
+<section id="contact" class="bg-light">
+  <div class="container-fluid p-0">
+    <div class="row mx-0">
+      <div class="col-md-2 p-0">
+        <div class="footer_bottom_left contact_left p-3 text-end position-relative d-none d-md-block">
+          <span class="text-white fs-5"><?= esc($category['name'] ?? 'Category') ?></span>
         </div>
-    <?php endforeach; ?>
-<?php else: ?>
-    <p>Chưa có bài viết.</p>
-<?php endif; ?>
+      </div>
+      <div class="col-md-10 p-0">
+        <div class="contact_righto  p-3 bg-white">
+          <span class="mb-0 font_11 light_gray">
+            <a class="fw-bold" href="<?= site_url('/') ?>">Home</a>
+            <span class="mx-2">/</span>
+            <?= esc($category['name'] ?? 'Category') ?>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="news" class="pt-0 pt-md-5 pb-5 bg-light">
+  <div class="container-xl">
+    <div class="row news_1">
+      <div class="col-md-8">
+        <div class="news_1_left">
+
+          <!-- LIST POSTS -->
+          <div class="news_1_left3">
+            <div class="row row-cols-1 row-cols-lg-2 row-cols-md-1">
+              <?php if (! empty($posts) && is_array($posts)): ?>
+                <?php foreach ($posts as $post): ?>
+                  <div class="col mb-3">
+                    <div class="card">
+                      <div class="card-body p-0">
+                        <div class="blog_1 position-relative">
+                          <div class="blog_1_inner_top">
+                            <a href="<?= esc($urlOf($post)) ?>">
+                              <img src="<?= esc($imgOf($post)) ?>" class="img-fluid" alt="<?= esc($post['title'] ?? '') ?>">
+                            </a>
+                          </div>
+
+                          <div class="blog_1_inner position-absolute top-0 p-3">
+                            <b class="d-inline-block bg_yellow text-white p-1 px-3 font_10 text-uppercase rounded-1">
+                              <?= esc($category['name'] ?? 'Category') ?>
+                            </b>
+                          </div>
+
+                          <!-- Social icons giữ nguyên theo template -->
+                          <div class="blog_1_inner_1 position-absolute text-end w-100 p-3">
+                            <ul class="mb-0">
+                              <li class="d-block fs-6 mt-2"><a class="d-block bg-info text-white  rounded-circle text-center icon_1 icon_2" href="#"><i class="fa-brands fa-facebook-f"></i></a></li>
+                              <li class="d-block fs-6 mt-2"><a class="d-block bg-danger text-white  rounded-circle text-center icon_1 icon_2" href="#"><i class="fa-brands fa-twitter"></i></a></li>
+                              <li class="d-block fs-6 mt-2"><a class="d-block bg-success text-white  rounded-circle text-center icon_1 icon_2" href="#"><i class="fa-brands fa-pinterest-p"></i></a></li>
+                              <li class="d-block fs-6 mt-2"><a class="d-block bg_violet text-white  rounded-circle text-center icon_1 icon_2" href="#"><i class="fa-brands fa-instagram"></i></a></li>
+                              <li class="d-block fs-6 mt-2"><a class="d-block bg_yellow text-white  rounded-circle text-center icon_1"><i class="fa fa-plus"></i></a></li>
+                            </ul>
+                          </div>
+                        </div>
+
+                        <div class="blog_2 pt-3 pb-3">
+                          <span class="light_gray font_12 fw-bold px-3 text-uppercase"><?= esc($dateOf($post)) ?></span>
+                          <b class="d-block fs-5 text-uppercase mt-2 px-3">
+                            <a href="<?= esc($urlOf($post)) ?>"><?= esc($post['title'] ?? '') ?></a>
+                          </b>
+                          <p class="gray_dark mt-3 px-3 mb-0"><?= esc($excerptOf($post)) ?></p>
+                          <hr>
+                          <ul class="mb-0 px-3 font_11 fw-bold text-uppercase justify-content-between d-flex">
+                            <li>
+                              <a href="<?= esc($urlOf($post)) ?>"><img class="rounded-circle" alt="abc" src="<?= base_url('image/8.jpg') ?>"></a>
+                              <span class="light_gray ms-2"><?= esc($post['author'] ?? $post['author_name'] ?? 'Admin') ?></span>
+                            </li>
+                            <li class="my-auto">
+                              <a class="light_gray" href="<?= esc($urlOf($post)) ?>"><i class="fa fa-eye me-1"></i> <?= esc($viewsOf($post)) ?></a>
+                              <a class="light_gray mx-3" href="<?= esc($urlOf($post)) ?>"><i class="fa fa-heart me-1 text-danger"></i> <?= esc($likesOf($post)) ?></a>
+                              <a class="light_gray" href="<?= esc($urlOf($post)) ?>"><i class="fa fa-comment me-1"></i> <?= esc($commentsOf($post)) ?></a>
+                            </li>
+                          </ul>
+                        </div>
+
+                      </div>
+                    </div>
+                  </div>
+                <?php endforeach; ?>
+              <?php else: ?>
+                <div class="col">
+                  <div class="bg-white p-4 border_light">
+                    <b class="d-block text-uppercase">Không có bài viết trong danh mục này.</b>
+                  </div>
+                </div>
+              <?php endif; ?>
+            </div>
+
+            <!-- PAGINATION -->
+            <?php if (isset($pager) && $pager): ?>
+              <div class="mt-4 d-flex justify-content-center">
+                <?= $pager->links('default') ?>
+                <!--
+                  KHÔNG dùng: $pager->links('default', 'bootstrap')
+                  vì bạn đang bị lỗi: "bootstrap" is not a valid Pager template.
+                  Nếu muốn template bootstrap, phải khai báo trong Config\\Pager.php.
+                -->
+              </div>
+            <?php endif; ?>
+          </div>
+          <!-- END LIST POSTS -->
+
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="news_1_right">
+
+          <!-- SOCIAL BLOCK (giữ nguyên) -->
+          <div class="news_1_right1">
+            <ul class="mb-0 bg_violet d-flex justify-content-between">
+              <li><a class="bg_violet_dark social_icon d-inline-block text-center text-white" href="#"><i class="fa-brands fa-facebook-f"></i></a></li>
+              <li class="lh-1 social_text text-uppercase">
+                <a class="text-white" href="#">
+                  <span class="font_13">
+                    <b>Like Our Facebook Page </b><br>
+                    <span class="font_11">86500 Likes</span>
+                  </span>
+                </a>
+              </li>
+              <li class="pt-3 pe-3"><a class="rounded-circle plus_icon rounded-circle text-white d-inline-block font_14 text-center" href="#"><i class="fa-brands fa-plus"></i></a></li>
+            </ul>
+            <ul class="mb-0 bg-primary d-flex justify-content-between mt-3">
+              <li><a class="bg_primary_dark social_icon d-inline-block text-center text-white" href="#"><i class="fa-brands fa-twitter"></i></a></li>
+              <li class="lh-1 social_text text-uppercase">
+                <a class="text-white" href="#">
+                  <span class="font_13">
+                    <b>Follow us twitter Page </b><br>
+                    <span class="font_11">58500 Followers</span>
+                  </span>
+                </a>
+              </li>
+              <li class="pt-3 pe-3"><a class="rounded-circle plus_icon rounded-circle text-white d-inline-block font_14 text-center" href="#"><i class="fa-brands fa-plus"></i></a></li>
+            </ul>
+            <ul class="mb-0 bg_yellow d-flex justify-content-between mt-3">
+              <li><a class="bg_warning_dark social_icon d-inline-block text-center text-white" href="#"><i class="fa fa-rss"></i></a></li>
+              <li class="lh-1 social_text text-uppercase">
+                <a class="text-white" href="#">
+                  <span class="font_13">
+                    <b>Subscribe to our rss </b><br>
+                    <span class="font_11">585 Subscribers</span>
+                  </span>
+                </a>
+              </li>
+              <li class="pt-3 pe-3"><a class="rounded-circle plus_icon rounded-circle text-white d-inline-block font_14 text-center" href="#"><i class="fa-brands fa-plus"></i></a></li>
+            </ul>
+          </div>
+
+          <!-- Popular News (KHÔNG BỎ) -->
+          <div class="news_1_right1 bg-white mt-3 border_light">
+            <b class="d-block text-uppercase p-3 border_thick">Popular News</b>
+            <ul class="mb-0 border-top pt-3">
+              <?php if (! empty($popularNews) && is_array($popularNews)): ?>
+                <?php foreach ($popularNews as $p): ?>
+                  <li class="d-flex border-bottom pb-3 mb-3">
+                    <span class="ps-3"><a href="<?= esc($urlOf($p)) ?>"><img width="70" alt="abc" src="<?= esc($imgOf($p)) ?>"></a></span>
+                    <span class="flex-column mx-3">
+                      <b class="d-inline-block bg_violet text-white p-1 px-3 font_10 text-uppercase rounded-1">Popular</b>
+                      <b class="d-block font_13 text-uppercase mt-1"><a href="<?= esc($urlOf($p)) ?>"><?= esc($p['title'] ?? '') ?></a></b>
+                      <span class="light_gray font_10 fw-bold text-uppercase"> <i class="fa fa-clock me-1 text-warning align-middle"></i> <?= esc($dateOf($p)) ?></span>
+                    </span>
+                  </li>
+                <?php endforeach; ?>
+              <?php else: ?>
+                <li class="px-3 pb-3">Chưa có dữ liệu.</li>
+              <?php endif; ?>
+            </ul>
+          </div>
+
+          <!-- Trending News (KHÔNG BỎ) -->
+          <div class="news_1_right1 bg-white mt-3 border_light">
+            <b class="d-block text-uppercase p-3 border_thick">Trending News</b>
+            <div class="news_1_left1_inner_right">
+              <ul class="nav nav-tabs mb-0 fw-bold font_11 border-top border-bottom pt-1 pb-1 justify-content-around">
+                <li class="nav-item d-inline-block">
+                  <a href="#profile8" data-bs-toggle="tab" aria-expanded="false" class="nav-link active text-center">
+                    <span class="d-md-block text-uppercase">Newest</span>
+                  </a>
+                </li>
+                <li class="nav-item d-inline-block">
+                  <a href="#profile9" data-bs-toggle="tab" aria-expanded="true" class="nav-link text-center">
+                    <span class="d-md-block text-uppercase">Most Commented</span>
+                  </a>
+                </li>
+                <li class="nav-item d-inline-block">
+                  <a href="#profile10" data-bs-toggle="tab" aria-expanded="true" class="nav-link border-end-0 text-center">
+                    <span class="d-md-block text-uppercase">Popular</span>
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            <div class="tab-content">
+              <div class="tab-pane active" id="profile8">
+                <div class="profile8_inner">
+                  <ul class="mb-0 mt-3">
+                    <?php if (! empty($trendingNewest) && is_array($trendingNewest)): ?>
+                      <?php foreach ($trendingNewest as $p): ?>
+                        <li class="border-bottom pb-3 mb-3">
+                          <b class="d-inline-block bg_yellow text-white p-1 px-3 font_10 text-uppercase rounded-1 mx-3">Newest</b>
+                          <b class="d-block font_15 text-uppercase mt-2 px-3"><a href="<?= esc($urlOf($p)) ?>"><?= esc($p['title'] ?? '') ?></a></b>
+                          <span class="light_gray font_10 fw-bold text-uppercase px-3"> <i class="fa fa-clock me-1 text-warning align-middle"></i> <?= esc($dateOf($p)) ?></span>
+                          <span class="gray_dark mt-3 px-3 font_12 mb-0 d-block"><?= esc($excerptOf($p)) ?></span>
+                        </li>
+                      <?php endforeach; ?>
+                    <?php else: ?>
+                      <li class="px-3 pb-3">Chưa có dữ liệu.</li>
+                    <?php endif; ?>
+                  </ul>
+                </div>
+              </div>
+
+              <div class="tab-pane" id="profile9">
+                <div class="profile8_inner">
+                  <ul class="mb-0 mt-3">
+                    <?php if (! empty($trendingCommented) && is_array($trendingCommented)): ?>
+                      <?php foreach ($trendingCommented as $p): ?>
+                        <li class="border-bottom pb-3 mb-3">
+                          <b class="d-inline-block bg_orange text-white p-1 px-3 font_10 text-uppercase rounded-1 mx-3">Commented</b>
+                          <b class="d-block font_15 text-uppercase mt-2 px-3"><a href="<?= esc($urlOf($p)) ?>"><?= esc($p['title'] ?? '') ?></a></b>
+                          <span class="light_gray font_10 fw-bold text-uppercase px-3"> <i class="fa fa-clock me-1 text-warning align-middle"></i> <?= esc($dateOf($p)) ?></span>
+                          <span class="gray_dark mt-3 px-3 font_12 mb-0 d-block"><?= esc($excerptOf($p)) ?></span>
+                        </li>
+                      <?php endforeach; ?>
+                    <?php else: ?>
+                      <li class="px-3 pb-3">Chưa có dữ liệu.</li>
+                    <?php endif; ?>
+                  </ul>
+                </div>
+              </div>
+
+              <div class="tab-pane" id="profile10">
+                <ul class="mb-0 mt-3">
+                  <?php if (! empty($trendingPopular) && is_array($trendingPopular)): ?>
+                    <?php foreach ($trendingPopular as $p): ?>
+                      <li class="border-bottom pb-3 mb-3">
+                        <b class="d-inline-block bg_yellow text-white p-1 px-3 font_10 text-uppercase rounded-1 mx-3">Popular</b>
+                        <b class="d-block font_15 text-uppercase mt-2 px-3"><a href="<?= esc($urlOf($p)) ?>"><?= esc($p['title'] ?? '') ?></a></b>
+                        <span class="light_gray font_10 fw-bold text-uppercase px-3"> <i class="fa fa-clock me-1 text-warning align-middle"></i> <?= esc($dateOf($p)) ?></span>
+                        <span class="gray_dark mt-3 px-3 font_12 mb-0 d-block"><?= esc($excerptOf($p)) ?></span>
+                      </li>
+                    <?php endforeach; ?>
+                  <?php else: ?>
+                    <li class="px-3 pb-3">Chưa có dữ liệu.</li>
+                  <?php endif; ?>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Popular tags (KHÔNG BỎ) -->
+          <div class="news_1_right1 bg-white mt-3 border_light pb-3">
+            <b class="d-block text-uppercase p-3 border_thick">Popular tags</b>
+            <ul class="mb-0 d-flex flex-wrap text-uppercase font_11 tags border-top px-3 pt-3">
+              <?php if (! empty($categories) && is_array($categories)): ?>
+                <?php foreach ($categories as $c): ?>
+                  <li class="mx-1 mt-1 mb-1">
+                    <a class="d-block border p-2 px-3" href="<?= site_url('category/' . ($c['slug'] ?? '')) ?>">
+                      <?= esc($c['name'] ?? '') ?>
+                    </a>
+                  </li>
+                <?php endforeach; ?>
+              <?php else: ?>
+                <li class="mx-1 mt-1 mb-1"><a class="d-block border p-2 px-3" href="#">News</a></li>
+                <li class="mx-1 mt-1 mb-1"><a class="d-block border p-2 px-3" href="#">Football</a></li>
+                <li class="mx-1 mt-1 mb-1"><a class="d-block border p-2 px-3" href="#">Sports</a></li>
+              <?php endif; ?>
+            </ul>
+          </div>
+
+          <!-- Our Newsletter (KHÔNG BỎ) -->
+          <div class="news_1_right1 bg-white mt-3 border_light pb-4">
+            <b class="d-block text-uppercase p-3 border_thick">Our Newsletter</b>
+            <b class="px-3 text-uppercase font_11 border-top pt-3 d-block">Subscribe Now!</b>
+            <p class="px-3 mt-2 mb-3">Aliqm Lorem Ante, Dapibus In, Viverra Feugiat Phasellus.</p>
+            <div class="input-group px-3">
+              <input type="text" class="form-control font_11" placeholder="Your Email address...">
+              <span class="input-group-btn">
+                <button class="btn btn-primary bg_violet_dark border-0 rounded-0 p-3 px-4 font_11" type="button">SEND</button>
+              </span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
 
 <?= $this->endSection() ?>

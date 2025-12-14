@@ -2,68 +2,94 @@
 
 namespace App\Controllers;
 
-use App\Models\PostModel;
-use App\Models\LeagueModel;
-use App\Models\StandingsModel;
-use App\Models\MatchModel;
-
 class Home extends BaseController
 {
-    protected $postModel;
-    protected $leagueModel;
-    protected $standingsModel;
-    protected $matchModel;
-
-    public function __construct()
-    {
-        $this->postModel      = new PostModel();
-        $this->leagueModel    = new LeagueModel();
-        $this->standingsModel = new StandingsModel();
-        $this->matchModel     = new MatchModel();
-    }
-
     public function index()
     {
-        // Tin nổi bật dùng cho hero (1 tin to + các tin nhỏ)
-        $featured = $this->postModel->getHomeFeatured(5);
+        $db = db_connect();
 
-        // Tin mới dưới hero – bỏ qua 5 tin nổi bật đầu
-        $latest = $this->postModel->getLatest(20, 5);
+        // Posts
+        $basePostSelect = "posts.id, posts.category_id, posts.title, posts.slug, posts.summary, posts.thumbnail, posts.view_count, posts.published_at,
+                           categories.name AS category_name, categories.slug AS category_slug";
 
-        // Tin đọc nhiều (trending)
-        $trending = $this->postModel->getTrending(10);
+        $featuredPosts = $db->table('posts')
+            ->select($basePostSelect)
+            ->join('categories', 'categories.id = posts.category_id', 'left')
+            ->where('posts.status', 'published')
+            ->where('posts.is_featured', 1)
+            ->orderBy('posts.published_at', 'DESC')
+            ->limit(5)
+            ->get()->getResultArray();
 
-        // Lịch thi đấu hôm nay
-        $todayMatches = $this->matchModel->getTodayMatches();
+        $trendingPosts = $db->table('posts')
+            ->select($basePostSelect)
+            ->join('categories', 'categories.id = posts.category_id', 'left')
+            ->where('posts.status', 'published')
+            ->where('posts.is_hot', 1)
+            ->orderBy('posts.published_at', 'DESC')
+            ->limit(8)
+            ->get()->getResultArray();
 
-        // Lấy 1 giải để hiển thị BXH – ưu tiên Premier League
-        $league = $this->leagueModel
-            ->where('slug', 'premier-league')
-            ->first();
+        $popularPosts = $db->table('posts')
+            ->select($basePostSelect)
+            ->join('categories', 'categories.id = posts.category_id', 'left')
+            ->where('posts.status', 'published')
+            ->orderBy('posts.view_count', 'DESC')
+            ->orderBy('posts.published_at', 'DESC')
+            ->limit(8)
+            ->get()->getResultArray();
 
-        if (! $league) {
-            $league = $this->leagueModel->first();
+        $latestPosts = $db->table('posts')
+            ->select($basePostSelect)
+            ->join('categories', 'categories.id = posts.category_id', 'left')
+            ->where('posts.status', 'published')
+            ->orderBy('posts.published_at', 'DESC')
+            ->limit(10)
+            ->get()->getResultArray();
+
+        // ===== Banner data cho carousel (mỗi tab 2 bài) =====
+        $bannerAll      = array_slice($featuredPosts, 0, 2);   // tab #home (All)
+        $bannerTrending = array_slice($trendingPosts, 0, 2);   // tab #profile1 (Trending)
+        $bannerPopular  = array_slice($popularPosts, 0, 2);    // tab #profile2 (Popular)
+        $bannerLatest   = array_slice($latestPosts, 0, 2);     // tab #profile3 (Latest)
+
+        // Videos (optional section)
+        $videos = [];
+        if ($db->tableExists('videos')) {
+            $videos = $db->table('videos')
+                ->select('id, title, slug, summary, embed_url, thumbnail, updated_at')
+                ->where('status', 'published')
+                ->orderBy('updated_at', 'DESC')
+                ->limit(4)
+                ->get()->getResultArray();
         }
 
-        $standings = [];
-        if ($league) {
-            $standings = $this->standingsModel
-                ->select('standings.*, teams.name, teams.logo')
-                ->join('teams', 'teams.id = standings.team_id')
-                ->where('standings.league_id', $league['id'])
-                ->orderBy('points', 'DESC')
-                ->orderBy('goals_for', 'DESC')
-                ->orderBy('goals_against', 'ASC')
-                ->findAll(10);
+        // Ads (optional)
+        $ads = [];
+        if ($db->tableExists('ads')) {
+            $ads = $db->table('ads')
+                ->select('id, title, position, image, link, html, is_active, sort_order')
+                ->where('is_active', 1)
+                ->orderBy('position', 'ASC')
+                ->orderBy('sort_order', 'ASC')
+                ->get()->getResultArray();
         }
 
         return view('frontend/home', [
-            'featured'      => $featured,
-            'latest'        => $latest,
-            'trending'      => $trending,
-            'todayMatches'  => $todayMatches,
-            'league'        => $league,
-            'standings'     => $standings,
+            'title'         => 'Trang chủ',
+            'featuredPosts' => $featuredPosts,
+            'trendingPosts' => $trendingPosts,
+            'popularPosts'  => $popularPosts,
+            'latestPosts'   => $latestPosts,
+
+            // Gắn vào carousel
+            'bannerAll'      => $bannerAll,
+            'bannerTrending' => $bannerTrending,
+            'bannerPopular'  => $bannerPopular,
+            'bannerLatest'   => $bannerLatest,
+
+            'videos'        => $videos,
+            'ads'           => $ads,
         ]);
     }
 }

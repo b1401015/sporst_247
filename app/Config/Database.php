@@ -25,10 +25,10 @@ class Database extends BaseConfig
      */
     public array $default = [
         'DSN'      => '',
-        'hostname' => 'host.docker.internal',
+        'hostname' => 'localhost',
         'username' => 'root',
-        'password' => 'vkzvmlPLCUY8qDM',
-        'database' => 'sport_247',
+        'password' => '',
+        'database' => 'sport_247_1',
         'DBDriver' => 'MySQLi',
         'DBPrefix' => '',
         'pConnect' => false,

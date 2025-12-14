@@ -1,0 +1,47 @@
+# ===== OS / Editor =====
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*.tmp
+*.bak
+.idea/
+.vscode/
+*.code-workspace
+
+# ===== Dependencies =====
+/vendor/
+
+# ===== Environment =====
+.env
+.env.*          # nếu bạn dùng nhiều env (tùy bạn có muốn giữ lại không)
+
+# ===== CI4 Writable (runtime) =====
+/writable/*
+!/writable/.htaccess
+!/writable/index.html
+
+# Logs / Cache / Sessions / Debug
+/writable/cache/*
+/writable/logs/*
+/writable/session/*
+/writable/debugbar/*
+/writable/uploads/*
+
+# ===== Build / Node (nếu có) =====
+/node_modules/
+/public/build/
+/public/hot
+
+# ===== PHPUnit / Tests =====
+.phpunit.result.cache
+/tests/_support/_generated
+
+# ===== Composer artifacts =====
+composer.phar
+
+# ===== CI4 user guide (nếu bạn có) =====
+/public/user_guide/
+
+# ===== Misc =====
+*.log
