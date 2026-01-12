@@ -92,7 +92,7 @@ foreach (($categories ?? []) as $c) {
             <!-- HOME giữ nguyên -->
             <li class="nav-item">
               <a class="nav-link dropdown-toggle active" href="<?= base_url() ?>" title="Visit home page">
-                Home
+                TRANG CHỦ
               </a>
             </li>
 

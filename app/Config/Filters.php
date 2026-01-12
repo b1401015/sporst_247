@@ -14,7 +14,12 @@ class Filters extends BaseConfig
 
     public $globals = [
         'before' => [
-            'csrf',
+            // Bật CSRF nhưng loại trừ API để Postman/curl gọi được
+            'csrf' => [
+                'except' => [
+                    'api/*',
+                ],
+            ],
         ],
         'after'  => [
             'toolbar',

@@ -431,3 +431,7 @@ WHERE id = 2;
 UPDATE ads SET
     title = 'Sidebar phải 300x250 - slot 2'
 WHERE id = 3;
+ALTER TABLE posts
+  ADD COLUMN source_url VARCHAR(500) NULL AFTER thumbnail,
+  ADD COLUMN source_name VARCHAR(50) NULL AFTER source_url,
+  ADD UNIQUE KEY uniq_source_url (source_url);

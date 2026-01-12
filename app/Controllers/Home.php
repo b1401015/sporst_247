@@ -1,13 +1,14 @@
 <?php
 
 namespace App\Controllers;
-
+use App\Services\FootballApiService;
 class Home extends BaseController
 {
     public function index()
     {
         $db = db_connect();
-
+        $fs = new FootballApiService();
+        //print_r($fs->todaysMatches());die;
         // Posts
         $basePostSelect = "posts.id, posts.category_id, posts.title, posts.slug, posts.summary, posts.thumbnail, posts.view_count, posts.published_at,
                            categories.name AS category_name, categories.slug AS category_slug";
@@ -49,6 +50,7 @@ class Home extends BaseController
 
         // ===== Banner data cho carousel (mỗi tab 2 bài) =====
         $bannerAll      = array_slice($featuredPosts, 0, 2);   // tab #home (All)
+       // print_r($bannerAll);
         $bannerTrending = array_slice($trendingPosts, 0, 2);   // tab #profile1 (Trending)
         $bannerPopular  = array_slice($popularPosts, 0, 2);    // tab #profile2 (Popular)
         $bannerLatest   = array_slice($latestPosts, 0, 2);     // tab #profile3 (Latest)
@@ -90,6 +92,8 @@ class Home extends BaseController
 
             'videos'        => $videos,
             'ads'           => $ads,
+
+            'todayMatches' => $fs->todaysMatches(),
         ]);
     }
 }

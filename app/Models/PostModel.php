@@ -12,7 +12,7 @@ class PostModel extends Model
     protected $allowedFields = [
         'category_id','title','slug','summary','content',
         'thumbnail','status','is_featured','is_hot',
-        'view_count','published_at','created_by'
+        'view_count','published_at','created_by','source_url','source_name'
     ];
 
     protected $useTimestamps = true;

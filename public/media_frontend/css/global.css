@@ -25,11 +25,18 @@ Licence: <a href="https://www.templateonweb.com/license">Website Template Licenc
 	--warning_dark:#3a9b72;
 	--green: #4dc392;
 	--gray_bright:#cdcdd1;
+	--font-body: "Be Vietnam Pro", system-ui, -apple-system, "Segoe UI", Roboto, Arial, "Noto Sans", "Helvetica Neue", sans-serif;
+}
+html, body{
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  letter-spacing: 0.1px;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-body{
-	font-family: "Playwrite GB S", cursive;
-}
 
 ul{
 	list-style:none;
@@ -685,7 +692,9 @@ h5{
 }
 /*********************footer_end****************/
 
-
+.fs-embed-body {
+    max-height: 1000px !important;
+}
 
 @media screen and (max-width : 767px){
 

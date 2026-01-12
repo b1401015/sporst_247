@@ -43,6 +43,8 @@ $routes->group('api', function($routes) {
     $routes->get('standings/league/(:segment)', 'Api\Standings::league/$1');
     $routes->get('standings/league/(:segment)/week/(:num)', 'Api\Standings::week/$1/$2');
     $routes->get('standings/league/(:segment)/scorers', 'Api\Standings::scorers/$1');
+    $routes->post('rss/import', 'Api\Rss::import');
+
 });
 
 $routes->group('admin', ['filter' => 'auth'], function($routes) {
