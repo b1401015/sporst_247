@@ -2,15 +2,13 @@
 $matches = $todayMatches ?? [];
 $matches = array_slice($matches, 0, 12);
 
-// Format giờ theo Asia/Ho_Chi_Minh (tránh lệch timezone server)
 $fmtTime = function($unix){
     if (!$unix) return '--:--';
-    $dt = new DateTime('@' . (int)$unix); // epoch seconds
+    $dt = new DateTime('@' . (int)$unix);
     $dt->setTimezone(new DateTimeZone('Asia/Ho_Chi_Minh'));
     return $dt->format('H:i');
 };
 
-// Chuẩn hoá status
 $normalizeStatus = function($short){
     $short = strtoupper((string)$short);
     if (in_array($short, ['FT','AET','PEN'], true)) return 'finished';
@@ -39,7 +37,6 @@ $normalizeStatus = function($short){
     <?php else: ?>
       <?php foreach ($matches as $i => $m): ?>
         <?php
-          // Data từ API-Football
           $league     = $m['league']['name'] ?? 'Football';
           $leagueLogo = $m['league']['logo'] ?? '';
 
@@ -49,8 +46,8 @@ $normalizeStatus = function($short){
           $away     = $m['teams']['away']['name'] ?? 'Away';
           $awayLogo = $m['teams']['away']['logo'] ?? '';
 
-          $kickoff = $m['fixture']['timestamp'] ?? null;
-          $time    = $fmtTime($kickoff);
+          $kickoff  = $m['fixture']['timestamp'] ?? null;
+          $timeText = $fmtTime($kickoff);
 
           $statusShort = $m['fixture']['status']['short'] ?? '';
           $status      = $normalizeStatus($statusShort);
@@ -58,43 +55,47 @@ $normalizeStatus = function($short){
           $hg = $m['goals']['home'] ?? null;
           $ag = $m['goals']['away'] ?? null;
 
-          // Center text: luôn hiện giờ; nếu có tỉ số thì kèm
-          $score = trim(($hg ?? '-') . ' - ' . ($ag ?? '-'));
-          $centerText = ($hg !== null || $ag !== null) ? ($time . ' • ' . $score) : $time;
-
-          // Badge trạng thái
-          $badge = '';
-          if ($status === 'live')     $badge = '<span class="badge bg-danger ms-2" style="font-size:10px;">LIVE</span>';
-          if ($status === 'finished') $badge = '<span class="badge bg-secondary ms-2" style="font-size:10px;">FT</span>';
+          $scoreText = ($hg !== null || $ag !== null) ? trim(($hg ?? '-') . ' - ' . ($ag ?? '-')) : '';
 
           $fixtureId = $m['fixture']['id'] ?? null;
           $detailUrl = '#'; // $fixtureId ? site_url('match/' . $fixtureId) : '#';
         ?>
 
-        <li class="px-3 py-2 <?= $i < count($matches)-1 ? 'border-bottom' : '' ?>">
-          <!-- Responsive wrapper: mobile dọc, desktop ngang -->
-          <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-2">
+        <li class="<?= $i < count($matches)-1 ? 'border-bottom' : '' ?>">
+          <div class="px-3 py-2" style="min-width:0;">
 
-            <!-- League (desktop cố định 170px; mobile full) -->
-            <div class="d-flex align-items-center gap-2 flex-shrink-0"
-                 style="min-width:170px;max-width:170px;">
-              <?php if ($leagueLogo): ?>
-                <img src="<?= esc($leagueLogo) ?>" alt="" style="width:16px;height:16px;object-fit:contain;">
-              <?php endif; ?>
-              <span class="font_11 text-uppercase light_gray text-truncate" title="<?= esc($league) ?>">
-                <?= esc($league) ?>
-              </span>
+            <!-- TOP: League line (luôn hiện) -->
+            <div class="d-flex align-items-center justify-content-between gap-2">
+              <div class="d-flex align-items-center gap-2" style="min-width:0;">
+                <?php if ($leagueLogo): ?>
+                  <img src="<?= esc($leagueLogo) ?>" alt="" style="width:16px;height:16px;object-fit:contain;">
+                <?php endif; ?>
+                <span class="font_11 text-uppercase light_gray"
+                      style="display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width: 70vw;"
+                      title="<?= esc($league) ?>">
+                  <?= esc($league) ?>
+                </span>
+              </div>
+
+              <div class="flex-shrink-0">
+                <a href="<?= esc($detailUrl) ?>" class="text-decoration-none">»</a>
+              </div>
             </div>
 
-            <!-- Match row -->
-            <div class="flex-grow-1 w-100">
-              <!-- mobile: xếp cột | từ sm: 1 hàng -->
-              <div class="d-flex flex-column flex-sm-row align-items-stretch align-items-sm-center justify-content-center gap-2">
-
+            <!-- DESKTOP (>=576px): 3 cột đẹp -->
+            <div class="match-desktop mt-1" style="min-width:0;">
+              <div style="
+                display:grid;
+                grid-template-columns: 1fr 90px 1fr;
+                align-items:center;
+                column-gap:10px;
+                min-width:0;
+              ">
                 <!-- Home -->
-                <div class="d-flex align-items-center justify-content-between justify-content-sm-end gap-2"
-                     style="min-width:0; flex: 1 1 240px;">
-                  <span class="fw-bold text-uppercase text-truncate" style="min-width:0;" title="<?= esc($home) ?>">
+                <div class="d-flex align-items-center justify-content-end gap-2" style="min-width:0;">
+                  <span class="fw-bold text-uppercase"
+                        style="display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0;"
+                        title="<?= esc($home) ?>">
                     <?= esc($home) ?>
                   </span>
                   <?php if ($homeLogo): ?>
@@ -102,29 +103,94 @@ $normalizeStatus = function($short){
                   <?php endif; ?>
                 </div>
 
-                <!-- Center time/score -->
-                <div class="text-center flex-shrink-0" style="min-width:130px;">
-                  <span class="fw-bold text-primary"><?= esc($centerText) ?></span>
-                  <?= $badge ?>
+                <!-- Center (giờ / tỉ số / FT xuống dưới) -->
+                <div class="text-center" style="line-height:1.15;">
+                  <div class="fw-bold text-primary" style="font-size:14px;">
+                    <?= esc($timeText) ?>
+                  </div>
+
+                  <?php if ($scoreText): ?>
+                    <div class="fw-bold" style="font-size:14px;">
+                      <?= esc($scoreText) ?>
+                    </div>
+
+                    <?php if ($status === 'finished'): ?>
+                      <div><span class="badge bg-secondary" style="font-size:10px;">FT</span></div>
+                    <?php elseif ($status === 'live'): ?>
+                      <div><span class="badge bg-danger" style="font-size:10px;">LIVE</span></div>
+                    <?php else: ?>
+                      <div style="height:14px;"></div>
+                    <?php endif; ?>
+
+                  <?php else: ?>
+                    <div style="height:32px;"></div>
+                  <?php endif; ?>
                 </div>
 
                 <!-- Away -->
-                <div class="d-flex align-items-center justify-content-between justify-content-sm-start gap-2"
-                     style="min-width:0; flex: 1 1 240px;">
+                <div class="d-flex align-items-center justify-content-start gap-2" style="min-width:0;">
                   <?php if ($awayLogo): ?>
                     <img src="<?= esc($awayLogo) ?>" alt="" style="width:18px;height:18px;object-fit:contain;">
                   <?php endif; ?>
-                  <span class="fw-bold text-uppercase text-truncate" style="min-width:0;" title="<?= esc($away) ?>">
+                  <span class="fw-bold text-uppercase"
+                        style="display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0;"
+                        title="<?= esc($away) ?>">
                     <?= esc($away) ?>
                   </span>
                 </div>
-
               </div>
             </div>
 
-            <!-- Detail -->
-            <div class="text-end flex-shrink-0 align-self-end align-self-md-center" style="min-width:30px;">
-              <a href="<?= esc($detailUrl) ?>" class="text-decoration-none">»</a>
+            <!-- MOBILE (<576px): 1 hàng có TÊN CLB rõ ràng -->
+            <div class="match-mobile mt-2" style="min-width:0;">
+              <div style="
+                display:grid;
+                grid-template-columns: 1fr 80px 1fr;
+                align-items:center;
+                column-gap:8px;
+                min-width:0;
+              ">
+                <!-- Home -->
+                <div class="d-flex align-items-center gap-2" style="min-width:0;">
+                  <?php if ($homeLogo): ?>
+                    <img src="<?= esc($homeLogo) ?>" alt="" style="width:18px;height:18px;object-fit:contain;">
+                  <?php endif; ?>
+                  <span class="fw-bold"
+                        style="display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0;"
+                        title="<?= esc($home) ?>">
+                    <?= esc($home) ?>
+                  </span>
+                </div>
+
+                <!-- Center -->
+                <div class="text-center" style="line-height:1.1;">
+                  <div class="fw-bold text-primary" style="font-size:13px;">
+                    <?= esc($timeText) ?>
+                  </div>
+                  <div class="fw-bold" style="font-size:13px; min-height:16px;">
+                    <?= $scoreText ? esc($scoreText) : '&nbsp;' ?>
+                  </div>
+                  <?php if ($scoreText): ?>
+                    <?php if ($status === 'finished'): ?>
+                      <div><span class="badge bg-secondary" style="font-size:10px;">FT</span></div>
+                    <?php elseif ($status === 'live'): ?>
+                      <div><span class="badge bg-danger" style="font-size:10px;">LIVE</span></div>
+                    <?php endif; ?>
+                  <?php endif; ?>
+                </div>
+
+                <!-- Away -->
+                <div class="d-flex align-items-center gap-2 justify-content-end" style="min-width:0;">
+                  <span class="fw-bold"
+                        style="display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0;"
+                        title="<?= esc($away) ?>">
+                    <?= esc($away) ?>
+                  </span>
+                  <?php if ($awayLogo): ?>
+                    <img src="<?= esc($awayLogo) ?>" alt="" style="width:18px;height:18px;object-fit:contain;">
+                  <?php endif; ?>
+                </div>
+              </div>
             </div>
 
           </div>
@@ -134,3 +200,15 @@ $normalizeStatus = function($short){
     <?php endif; ?>
   </ul>
 </div>
+
+<style>
+  /* mặc định: hiện desktop, ẩn mobile */
+  .match-mobile { display:none; }
+  .match-desktop { display:block; }
+
+  /* mobile: ẩn desktop, hiện mobile */
+  @media (max-width: 575.98px){
+    .match-desktop { display:none; }
+    .match-mobile  { display:block; }
+  }
+</style>
