@@ -51,6 +51,8 @@ $routes->group('admin', ['filter' => 'auth'], function($routes) {
     $routes->get('/', 'Admin\Dashboard::index');
     $routes->presenter('posts',      ['controller' => 'Admin\Posts']);
     $routes->presenter('categories', ['controller' => 'Admin\Categories']);
+    $routes->presenter('layout-pages',  ['controller' => 'Admin\LayoutPages']);
+    $routes->presenter('layout-blocks', ['controller' => 'Admin\LayoutBlocks']);
     $routes->presenter('tags',       ['controller' => 'Admin\Tags']);
     $routes->presenter('leagues',    ['controller' => 'Admin\Leagues']);
     $routes->presenter('teams',      ['controller' => 'Admin\Teams']);

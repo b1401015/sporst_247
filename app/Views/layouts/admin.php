@@ -25,6 +25,7 @@
             <li class="nav-item"><a href="/admin/matches" class="nav-link text-white">Trận đấu</a></li>
             <li class="nav-item"><a href="/admin/ads" class="nav-link text-white">Quảng cáo</a></li>
             <li class="nav-item"><a href="/admin/settings" class="nav-link text-white">Cấu hình</a></li>
+            <li class="nav-item"><a href="/admin/layout-pages" class="nav-link text-white">Layout Pages</a></li>
             <li class="nav-item"><a href="/admin/users" class="nav-link text-white">Người dùng</a></li>
             <li class="nav-item mt-3"><a href="/logout" class="nav-link text-warning">Đăng xuất</a></li>
         </ul>

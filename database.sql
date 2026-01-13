@@ -435,3 +435,58 @@ ALTER TABLE posts
   ADD COLUMN source_url VARCHAR(500) NULL AFTER thumbnail,
   ADD COLUMN source_name VARCHAR(50) NULL AFTER source_url,
   ADD UNIQUE KEY uniq_source_url (source_url);
+-- Trang / ngữ cảnh hiển thị
+-- 1) Block types
+-- 1) Block types
+CREATE TABLE IF NOT EXISTS `layout_block_types` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `key` VARCHAR(80) NOT NULL,
+  `name` VARCHAR(120) NOT NULL,
+  `view_path` VARCHAR(255) NOT NULL,
+  `default_config` TEXT NULL,
+  `is_active` TINYINT(1) NOT NULL DEFAULT 1,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uniq_key` (`key`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 2) Layout pages (home + category + default category)
+CREATE TABLE IF NOT EXISTS `layout_pages` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `page_type` ENUM('home','category') NOT NULL,
+  `ref_id` INT NULL, -- category_id nếu page_type='category', NULL là default category
+  `title` VARCHAR(150) NULL,
+  `is_active` TINYINT(1) NOT NULL DEFAULT 1,
+  `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uniq_page` (`page_type`, `ref_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 3) Blocks theo page
+CREATE TABLE IF NOT EXISTS `layout_blocks` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `page_id` INT NOT NULL,
+  `region` VARCHAR(50) NOT NULL DEFAULT 'main',
+  `block_type_id` INT NOT NULL,
+  `title` VARCHAR(150) NULL,
+  `sort_order` INT NOT NULL DEFAULT 0,
+  `is_active` TINYINT(1) NOT NULL DEFAULT 1,
+  `config` TEXT NULL,
+  `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_page_region` (`page_id`,`region`,`sort_order`),
+  KEY `idx_block_type` (`block_type_id`),
+  CONSTRAINT `fk_layout_blocks_page` FOREIGN KEY (`page_id`) REFERENCES `layout_pages`(`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_layout_blocks_type` FOREIGN KEY (`block_type_id`) REFERENCES `layout_block_types`(`id`) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+INSERT INTO `layout_pages` (`page_type`,`ref_id`,`title`,`is_active`) VALUES
+('home', NULL, 'Home Layout', 1),
+('category', NULL, 'Default Category Layout', 1)
+ON DUPLICATE KEY UPDATE `title`=VALUES(`title`), `is_active`=VALUES(`is_active`);
+
+INSERT INTO `layout_block_types` (`key`,`name`,`view_path`,`default_config`,`is_active`) VALUES
+('featured_hero','Featured Hero','blocks/featured_hero','{\"limit\":5}',1),
+('post_list','Post List','blocks/post_list','{\"limit\":10,\"thumb\":true}',1),
+('ad_slot','Ad Slot','blocks/ad_slot','{\"position\":\"sidebar_top\"}',1)
+ON DUPLICATE KEY UPDATE `name`=VALUES(`name`), `view_path`=VALUES(`view_path`), `default_config`=VALUES(`default_config`), `is_active`=VALUES(`is_active`);
